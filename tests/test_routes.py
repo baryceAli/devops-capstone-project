@@ -72,6 +72,13 @@ class TestAccountService(TestCase):
 
     ######################################################################
     #  A C C O U N T   T E S T   C A S E S
+    def test_get_account_list(self):
+        """It should Get a list of accounts"""
+        self._create_accounts(5)
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 5)
     ######################################################################
 
     def test_index(self):
