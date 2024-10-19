@@ -139,6 +139,25 @@ class TestAccountService(TestCase):
         test_account.date_joined=datetime.now()
         response = self.client.put(f"{BASE_URL}/{test_account.id}", json=test_account.serialize())
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    # Delete an account
+    def test_delete_account(self):
+        """It should Delete a Product"""
+        accounts = self._create_accounts(5)
+        account_count = len(accounts)
+        test_account = accounts[0]
+        response = self.client.delete(f"{BASE_URL}/{test_account.id}")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data), 0)
+        # make sure they are deleted
+        response = self.client.get(f"{BASE_URL}/{test_account.id}")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        new_count = len(data)
+        self.assertEqual(new_count, account_count - 1)
+
     ######################################################################
 
     ######################################################################
