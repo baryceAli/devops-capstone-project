@@ -1,5 +1,5 @@
 ---
-name: ".github/ISSUE_TEMPLATE/user-story.md"
+name: user-story.md
 about: Describe this issue template's purpose here.
 title: ''
 labels: ''
