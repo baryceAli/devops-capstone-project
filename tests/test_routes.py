@@ -12,6 +12,7 @@ from tests.factories import AccountFactory
 from service.common import status  # HTTP Status Codes
 from service.models import db, Account, init_db
 from service.routes import app
+from datetime import datetime
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/postgres"
@@ -95,6 +96,7 @@ class TestAccountService(TestCase):
         # assert that data["name"] equals the test_account.name
         self.assertEqual(data["name"], test_account.name)
 
+    # acount not found
     def test_get_account_not_found(self):
         """It should return 404 not found' was not found."""
         # make a self.client.get request to the API endpoint and store the result in the variable named response
@@ -103,8 +105,41 @@ class TestAccountService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         # get the data from resp.get_json()
         data = response.get_json()
-        # assert that data["name"] equals the test_product.name
+        # assert that data["name"] equals the test_account.name
         self.assertIn("was not found", data["message"])
+
+    def test_update_accounts(self):
+        """It should Update an existing Account"""
+        # create a account to update
+        test_account = self._create_accounts(1)[0]
+        # make a self.client.get request to the API endpoint and store the result in the variable named response
+        response = self.client.get(f"{BASE_URL}/{test_account.id}")
+        # assert that the resp.status_code is status.HTTP_200_OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # get the data from resp.get_json()
+        # data = response.get_json()
+
+        # update the account
+        new_account = response.get_json()
+        new_account["name"] = "bashir"
+        response = self.client.put(f"{BASE_URL}/{new_account['id']}", 
+        json=new_account)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_account = response.get_json()
+        self.assertEqual(updated_account["name"], "bashir")
+
+    def test_update_un_exists_accounts(self):
+        """It should Update an existing Account"""
+        test_account = Account()
+        test_account.id=10
+        test_account.name ="bashir"
+        test_account.email="abc@def.com"
+        test_account.address="address"
+        test_account.phone_number="10125"
+        test_account.date_joined=datetime.now()
+        response = self.client.put(f"{BASE_URL}/{test_account.id}", json=test_account.serialize())
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+    ######################################################################
 
     ######################################################################
 
