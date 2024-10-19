@@ -72,6 +72,7 @@ class TestAccountService(TestCase):
 
     ######################################################################
     #  A C C O U N T   T E S T   C A S E S
+    # List All Accounts
     def test_get_account_list(self):
         """It should Get a list of accounts"""
         self._create_accounts(5)
@@ -79,6 +80,32 @@ class TestAccountService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), 5)
+
+    # Read an Account
+    def test_get_account(self):
+        """It should Get a single account"""
+        # get the id of a account
+        test_account = self._create_accounts(1)[0]
+        # make a self.client.get request to the API endpoint and store the result in the variable named response
+        response = self.client.get(f"{BASE_URL}/{test_account.id}")
+        # assert that the resp.status_code is status.HTTP_200_OK
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # get the data from resp.get_json()
+        data = response.get_json()
+        # assert that data["name"] equals the test_account.name
+        self.assertEqual(data["name"], test_account.name)
+
+    def test_get_account_not_found(self):
+        """It should return 404 not found' was not found."""
+        # make a self.client.get request to the API endpoint and store the result in the variable named response
+        response = self.client.get(f"{BASE_URL}/0")
+        # assert that the resp.status_code is status.HTTP_200_OK
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        # get the data from resp.get_json()
+        data = response.get_json()
+        # assert that data["name"] equals the test_product.name
+        self.assertIn("was not found", data["message"])
+
     ######################################################################
 
     def test_index(self):
